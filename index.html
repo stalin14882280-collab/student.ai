@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 Student AI — Твой помощник</title>
+    <title>🎓 Student AI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -123,8 +123,8 @@
 
         <div class="chat-container">
             <div class="chat-header">
-                <h2>🤖 Student AI</h2>
-                <span class="badge">Powered by GigaChat</span>
+                <h2>🤖 Student AI Assistant</h2>
+                <span class="badge">Projekt by. artefakt</span>
             </div>
 
             <div class="example-bar">
@@ -164,7 +164,8 @@
     </div>
 
     <script>
-        const CLIENT_SECRET = 'ТВОЙ_КЛЮЧ_СЮДА'; // 🔑 Замени на свой секретный ключ от GigaChat
+        // ⚙️ НАСТРОЙКИ (вставь сюда свою строку из кабинета GigaChat)
+        const AUTH_HEADER = 'MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg=='; // Например: 'Basic ZjI5ZmY5...'
         const AUTH_URL = 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
         const API_URL = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
         const SCOPE = 'GIGACHAT_API_PERS';
@@ -244,7 +245,9 @@
         async function getAccessToken() {
             if (accessToken) return accessToken;
 
-            const authHeader = 'Basic ' + btoa(`:${CLIENT_SECRET}`);
+            if (AUTH_HEADER === 'MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg==') {
+                throw new Error('❌ Не указан AUTH_HEADER. Вставь строку из кабинета GigaChat.');
+            }
             
             try {
                 const response = await fetch(AUTH_URL, {
@@ -253,7 +256,7 @@
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'Accept': 'application/json',
                         'RqUID': crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-                        'Authorization': authHeader
+                        'Authorization': AUTH_HEADER   // <-- Вот здесь используется готовая строка!
                     },
                     body: `scope=${SCOPE}`
                 });
@@ -276,11 +279,6 @@
             const question = input.value.trim();
             
             if (!question || isProcessing) return;
-            
-            if (CLIENT_SECRET === 'MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg==') {
-                addBotMessage("⚠️ <strong>Внимание!</strong> Нужно указать API ключ GigaChat.<br><br>Замените <code>'ТВОЙ_КЛЮЧ_СЮДА'</code> в коде на реальный ключ с <a href='https://developers.sber.ru/' target='_blank'>developers.sber.ru</a>");
-                return;
-            }
             
             input.value = '';
             addUserMessage(question);
@@ -313,7 +311,33 @@
                 });
                 
                 if (!response.ok) {
-                    accessToken = null;
+                    // Если токен протух, сбрасываем и пробуем ещё раз
+                    if (response.status === 401) {
+                        accessToken = null;
+                        const newToken = await getAccessToken();
+                        // Повторяем запрос с новым токеном
+                        const retryResponse = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'Authorization': `Bearer ${newToken}`
+                            },
+                            body: JSON.stringify({
+                                model: 'GigaChat',
+                                messages: [
+                                    { role: 'system', content: subjectPrompts[currentSubject] },
+                                    { role: 'user', content: question }
+                                ],
+                                temperature: 0.7,
+                                max_tokens: 2000
+                            })
+                        });
+                        if (!retryResponse.ok) throw new Error(`Ошибка API: ${retryResponse.status}`);
+                        const retryData = await retryResponse.json();
+                        addBotMessage(retryData.choices[0].message.content);
+                        return;
+                    }
                     throw new Error(`Ошибка API: ${response.status}`);
                 }
                 
