@@ -165,7 +165,7 @@
 
     <script>
         // ⚙️ НАСТРОЙКИ (вставь сюда свою строку из кабинета GigaChat)
-        const AUTH_HEADER = 'MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg=='; // Например: 'Basic ZjI5ZmY5...'
+        const AUTH_HEADER = 'Basic MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg==';'; // Например: 'Basic ZjI5ZmY5...'
         const AUTH_URL = 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
         const API_URL = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
         const SCOPE = 'GIGACHAT_API_PERS';
@@ -245,7 +245,7 @@
         async function getAccessToken() {
             if (accessToken) return accessToken;
 
-            if (AUTH_HEADER === 'MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg==') {
+            if (AUTH_HEADER === 'ЗАМЕНИ_НА_СТРОКУ_ИЗ_КАБИНЕТА') {
                 throw new Error('❌ Не указан AUTH_HEADER. Вставь строку из кабинета GigaChat.');
             }
             
