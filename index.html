@@ -3,297 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 Student AI</title>
+    <title>🎓 Student AI — Автономный (WebLLM)</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { text-align: center; color: white; margin-bottom: 30px; }
-        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .header h1 span { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 50px; }
-        .header p { font-size: 1.1rem; opacity: 0.9; }
-        .subjects {
-            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-            margin-bottom: 20px;
-        }
-        .subject-btn {
-            background: rgba(255,255,255,0.2); color: white;
-            border: 2px solid rgba(255,255,255,0.3); padding: 10px 20px;
-            border-radius: 50px; font-size: 14px; cursor: pointer;
-            transition: all 0.3s; font-weight: 500;
-        }
-        .subject-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
-        .subject-btn.active { background: white; color: #1e3c72; border-color: white; }
-        .chat-container {
-            background: white; border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;
-        }
-        .chat-header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white; padding: 20px; text-align: center;
-        }
-        .chat-header h2 { font-size: 1.5rem; margin-bottom: 5px; }
-        .chat-header .badge {
-            background: rgba(255,255,255,0.2); padding: 5px 15px;
-            border-radius: 20px; font-size: 0.9rem; display: inline-block;
-        }
-        .messages {
-            height: 450px; overflow-y: auto; padding: 20px; background: #f8f9fa;
-        }
-        .message { margin-bottom: 20px; display: flex; gap: 12px; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .message.user { flex-direction: row-reverse; }
-        .avatar {
-            width: 40px; height: 40px; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
-        }
-        .message.bot .avatar { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; }
-        .message.user .avatar { background: #e9ecef; }
-        .message-content {
-            background: white; padding: 15px 18px; border-radius: 18px;
-            max-width: 70%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); line-height: 1.5;
-        }
-        .message.user .message-content { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; }
-        .typing-indicator {
-            display: none; padding: 15px 20px; background: white; border-radius: 18px;
-            width: fit-content; margin-bottom: 20px;
-        }
-        .typing-indicator span {
-            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-            background: #1e3c72; margin: 0 3px; animation: typing 1.4s infinite;
-        }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-        .input-area {
-            padding: 20px; background: white; border-top: 1px solid #dee2e6;
-            display: flex; gap: 12px;
-        }
-        .input-area input {
-            flex: 1; padding: 15px 20px; border: 2px solid #e9ecef;
-            border-radius: 50px; font-size: 16px; outline: none;
-            transition: border-color 0.3s;
-        }
-        .input-area input:focus { border-color: #1e3c72; }
-        .input-area button {
-            background: linear-gradient(135deg, #1e3c72, #2a5298); color: white;
-            border: none; padding: 15px 30px; border-radius: 50px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .input-area button:hover {
-            transform: scale(1.02); box-shadow: 0 5px 20px rgba(30, 60, 114, 0.4);
-        }
-        .input-area button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .clear-btn { background: #6c757d !important; padding: 15px 20px !important; }
-        .example-bar {
-            padding: 10px 20px; background: #f1f3f5; font-size: 14px;
-            color: #495057; text-align: center; border-bottom: 1px solid #dee2e6;
-        }
-        .example-bar a {
-            color: #1e3c72; text-decoration: none; margin: 0 10px; cursor: pointer;
-        }
-        .example-bar a:hover { text-decoration: underline; }
+        body { font-family: Arial; max-width: 800px; margin: 20px auto; padding: 20px; }
+        #chat { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 10px; background: #f9f9f9; }
+        #input { width: 80%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background: #1e3c72; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #status { margin: 10px 0; color: #666; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><span>🎓 Student AI</span></h1>
-            <p>Нейросеть для решения примеров и задач по любым предметам</p>
-        </div>
+    <h2>🎓 Student AI (нейросеть в браузере)</h2>
+    <div id="status">⏳ Загрузка модели... (это займёт ~1-2 минуты, только при первом запуске)</div>
+    <div id="chat"></div>
+    <input id="input" placeholder="Напиши задачу..." onkeypress="if(event.key==='Enter') sendMessage()" disabled>
+    <button onclick="sendMessage()" id="sendBtn" disabled>Отправить</button>
 
-        <div class="subjects">
-            <button class="subject-btn active" data-subject="all">📚 Все предметы</button>
-            <button class="subject-btn" data-subject="math">📐 Математика</button>
-            <button class="subject-btn" data-subject="physics">⚡ Физика</button>
-            <button class="subject-btn" data-subject="chemistry">🧪 Химия</button>
-            <button class="subject-btn" data-subject="russian">📝 Русский язык</button>
-            <button class="subject-btn" data-subject="history">🏛️ История</button>
-            <button class="subject-btn" data-subject="english">🇬🇧 Английский</button>
-        </div>
+    <script type="module">
+        import { CreateWebWorkerMLCEngine, hasModelInCache } from "https://esm.run/@mlc-ai/web-llm";
 
-        <div class="chat-container">
-            <div class="chat-header">
-                <h2>🤖 Student AI Assistant</h2>
-                <span class="badge">Project by artefakt</span>
-            </div>
+        const chatDiv = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusDiv = document.getElementById('status');
 
-            <div class="example-bar">
-                <span>💡 Попробуйте: </span>
-                <a onclick="setExample('Реши уравнение: 3x² - 12x + 9 = 0')">Уравнение</a> •
-                <a onclick="setExample('Найди силу тока в цепи, если напряжение 220В, сопротивление 44Ом')">Физика</a> •
-                <a onclick="setExample('Проверь запятые: Солнце светило ярко но ветер был холодным')">Русский</a>
-            </div>
+        // Модель DeepSeek-R1 (сжатая для браузера, ~1.5 ГБ)
+        const MODEL = "deepseek-r1-qwen-1.5b-q4f16_1-MLC";
+        
+        let engine = null;
 
-            <div class="messages" id="messages">
-                <div class="message bot">
-                    <div class="avatar">🎓</div>
-                    <div class="message-content">
-                        <strong>Привет! Я Student AI — нейросеть для учёбы.</strong><br><br>
-                        Я помогу решить примеры, задачи и объясню материал по любым предметам:<br>
-                        • 📐 Математика (алгебра, геометрия, уравнения)<br>
-                        • ⚡ Физика (задачи, формулы, законы)<br>
-                        • 🧪 Химия (реакции, расчёты)<br>
-                        • 📝 Русский язык (правила, разборы)<br>
-                        • 🏛️ История (даты, события, анализ)<br>
-                        • 🇬🇧 Английский язык (перевод, грамматика)<br><br>
-                        <em>Напиши свой вопрос или задачу, и я всё решу с подробным объяснением!</em>
-                    </div>
-                </div>
-            </div>
-
-            <div id="typingIndicator" class="typing-indicator">
-                <span></span><span></span><span></span>
-            </div>
-
-            <div class="input-area">
-                <input type="text" id="userInput" placeholder="Напиши задачу или вопрос..." onkeypress="handleKeyPress(event)">
-                <button onclick="sendMessage()">➤ Отправить</button>
-                <button class="clear-btn" onclick="clearChat()">🗑️</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ================== НАСТРОЙКИ ==================
-        // Вставь сюда свою строку из кабинета GigaChat (без слова Basic, оно уже есть)
-        const AUTH_HEADER = 'Basic MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg==';
-        // =============================================
-
-        const AUTH_URL = 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
-        const API_URL = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
-        const SCOPE = 'GIGACHAT_API_PERS';
-
-        let accessToken = null;
-        let currentSubject = 'all';
-        let isProcessing = false;
-
-        const subjectPrompts = {
-            all: 'Ты — Student AI, нейросеть-помощник для учеников. Твоя задача — решать примеры и задачи по любым школьным предметам, объяснять материал понятным языком. Всегда давай подробные пошаговые решения.',
-            math: 'Ты — эксперт по математике. Решай уравнения, задачи, объясняй формулы. Всегда показывай пошаговое решение. Используй математическую нотацию.',
-            physics: 'Ты — эксперт по физике. Решай задачи, объясняй физические законы и явления. Приводи формулы и расчёты. Объясняй физический смысл.',
-            chemistry: 'Ты — эксперт по химии. Помогай с химическими уравнениями, расчётами, объясняй реакции и свойства веществ.',
-            russian: 'Ты — эксперт по русскому языку. Проверяй грамматику, пунктуацию, объясняй правила, делай разборы слов и предложений.',
-            history: 'Ты — эксперт по истории. Рассказывай о событиях, датах, исторических личностях. Анализируй причины и следствия.',
-            english: 'Ты — эксперт по английскому языку. Помогай с переводом, грамматикой, объясняй правила и употребление слов.'
-        };
-
-        // Вспомогательные функции
-        function setExample(text) { document.getElementById('userInput').value = text; }
-        function handleKeyPress(event) { if (event.key === 'Enter' && !isProcessing) sendMessage(); }
-
-        document.querySelectorAll('.subject-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentSubject = this.dataset.subject;
-                const subjects = { all: 'все предметы', math: 'математику', physics: 'физику', chemistry: 'химию', russian: 'русский язык', history: 'историю', english: 'английский язык' };
-                addBotMessage(`🔄 Переключился на <strong>${subjects[currentSubject]}</strong>. Задавай вопросы!`);
-            });
-        });
-
-        function addBotMessage(text) {
-            const messagesDiv = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot';
-            messageDiv.innerHTML = `<div class="avatar">🎓</div><div class="message-content">${text.replace(/\n/g, '<br>')}</div>`;
-            messagesDiv.appendChild(messageDiv);
-            scrollToBottom();
-        }
-
-        function addUserMessage(text) {
-            const messagesDiv = document.getElementById('messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message user';
-            messageDiv.innerHTML = `<div class="avatar">👤</div><div class="message-content">${text}</div>`;
-            messagesDiv.appendChild(messageDiv);
-            scrollToBottom();
-        }
-
-        function scrollToBottom() { const messagesDiv = document.getElementById('messages'); messagesDiv.scrollTop = messagesDiv.scrollHeight; }
-        function showTyping(show) { document.getElementById('typingIndicator').style.display = show ? 'block' : 'none'; scrollToBottom(); }
-
-        async function getAccessToken() {
-            if (accessToken) return accessToken;
-            if (AUTH_HEADER.includes('ТВОЯ_СТРОКА')) throw new Error('❌ Вставь свою строку авторизации в AUTH_HEADER!');
-            
-            const response = await fetch(AUTH_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Accept': 'application/json',
-                    'RqUID': crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-                    'Authorization': AUTH_HEADER
-                },
-                body: `scope=${SCOPE}`
-            });
-            if (!response.ok) throw new Error(`Ошибка авторизации: ${response.status}`);
-            const data = await response.json();
-            accessToken = data.access_token;
-            return accessToken;
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const question = input.value.trim();
-            if (!question || isProcessing) return;
-            
-            input.value = '';
-            addUserMessage(question);
-            isProcessing = true;
-            showTyping(true);
-            const sendButton = document.querySelector('.input-area button');
-            sendButton.disabled = true;
-
+        async function init() {
             try {
-                const token = await getAccessToken();
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({
-                        model: 'GigaChat',
-                        messages: [
-                            { role: 'system', content: subjectPrompts[currentSubject] },
-                            { role: 'user', content: question }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 2000
-                    })
-                });
-                if (!response.ok) {
-                    if (response.status === 401) { accessToken = null; return sendMessage(); }
-                    throw new Error(`Ошибка API: ${response.status}`);
+                // Проверяем, есть ли модель в кэше
+                const inCache = await hasModelInCache(MODEL);
+                if (!inCache) {
+                    statusDiv.textContent = "📦 Скачивание модели (~1.5 ГБ). Это только один раз...";
                 }
-                const data = await response.json();
-                addBotMessage(data.choices[0].message.content);
-            } catch (error) {
-                addBotMessage(`❌ Ошибка: ${error.message}`);
-            } finally {
-                isProcessing = false;
-                showTyping(false);
-                sendButton.disabled = false;
-                document.getElementById('userInput').focus();
+
+                engine = await CreateWebWorkerMLCEngine(
+                    new Worker(new URL("https://esm.run/@mlc-ai/web-llm/lib/worker.js"), { type: "module" }),
+                    MODEL,
+                    { 
+                        initProgressCallback: (progress) => {
+                            if (progress.progress === 1) {
+                                statusDiv.textContent = "✅ Модель загружена! Можно задавать вопросы.";
+                                input.disabled = false;
+                                sendBtn.disabled = false;
+                            } else {
+                                statusDiv.textContent = `⏳ Загрузка: ${Math.round(progress.progress * 100)}%`;
+                            }
+                        }
+                    }
+                );
+            } catch (e) {
+                statusDiv.textContent = "❌ Ошибка загрузки модели. Попробуй обновить страницу.";
+                console.error(e);
             }
         }
 
-        function clearChat() {
-            document.getElementById('messages').innerHTML = `
-                <div class="message bot">
-                    <div class="avatar">🎓</div>
-                    <div class="message-content"><strong>Чат очищен! Я Student AI — нейросеть для учёбы.</strong><br><br>Задавай вопросы!</div>
-                </div>`;
+        window.sendMessage = async function() {
+            const question = input.value.trim();
+            if (!question || !engine) return;
+
+            addMessage('👤 ' + question);
+            input.value = '';
+            sendBtn.disabled = true;
+            input.disabled = true;
+
+            try {
+                const systemPrompt = "Ты Student AI — помощник по всем школьным предметам. Отвечай кратко, по делу, с объяснениями.";
+                const fullPrompt = `${systemPrompt}\n\nВопрос: ${question}`;
+                
+                const reply = await engine.chat.completions.create({
+                    messages: [{ role: "user", content: fullPrompt }],
+                    temperature: 0.7,
+                    max_tokens: 2048,
+                });
+
+                const answer = reply.choices[0].message.content;
+                addMessage('🎓 ' + answer);
+            } catch (e) {
+                addMessage('❌ Ошибка: ' + e.message);
+            } finally {
+                sendBtn.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        };
+
+        function addMessage(text) {
+            chatDiv.innerHTML += `<p style="margin: 10px 0;">${text.replace(/\n/g, '<br>')}</p>`;
+            chatDiv.scrollTop = chatDiv.scrollHeight;
         }
 
-        window.onload = () => document.getElementById('userInput').focus();
+        // Запускаем инициализацию
+        init();
+
+        // Глобальная функция для Enter
+        window.sendMessage = sendMessage;
     </script>
 </body>
 </html>
