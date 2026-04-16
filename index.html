@@ -124,7 +124,7 @@
         <div class="chat-container">
             <div class="chat-header">
                 <h2>🤖 Student AI Assistant</h2>
-                <span class="badge">Projekt by. artefakt</span>
+                <span class="badge">Project by artefakt</span>
             </div>
 
             <div class="example-bar">
@@ -164,8 +164,11 @@
     </div>
 
     <script>
-        // ⚙️ НАСТРОЙКИ (вставь сюда свою строку из кабинета GigaChat)
-        const AUTH_HEADER = 'Basic MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg==';'; // Например: 'Basic ZjI5ZmY5...'
+        // ================== НАСТРОЙКИ ==================
+        // Вставь сюда свою строку из кабинета GigaChat (без слова Basic, оно уже есть)
+        const AUTH_HEADER = 'Basic MDE5ZDk2MDEtZGUwMS03M2VlLWJhMDItNzViNzIxMGE5ODU0OjcxYmEyMGFjLWM4NWEtNDBjMy1iNDBkLWUxMmE1NWJmYzQxZg==';
+        // =============================================
+
         const AUTH_URL = 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
         const API_URL = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
         const SCOPE = 'GIGACHAT_API_PERS';
@@ -184,26 +187,16 @@
             english: 'Ты — эксперт по английскому языку. Помогай с переводом, грамматикой, объясняй правила и употребление слов.'
         };
 
-        function setExample(text) {
-            document.getElementById('userInput').value = text;
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter' && !isProcessing) {
-                sendMessage();
-            }
-        }
+        // Вспомогательные функции
+        function setExample(text) { document.getElementById('userInput').value = text; }
+        function handleKeyPress(event) { if (event.key === 'Enter' && !isProcessing) sendMessage(); }
 
         document.querySelectorAll('.subject-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 currentSubject = this.dataset.subject;
-                const subjects = {
-                    all: 'все предметы', math: 'математику', physics: 'физику',
-                    chemistry: 'химию', russian: 'русский язык', history: 'историю',
-                    english: 'английский язык'
-                };
+                const subjects = { all: 'все предметы', math: 'математику', physics: 'физику', chemistry: 'химию', russian: 'русский язык', history: 'историю', english: 'английский язык' };
                 addBotMessage(`🔄 Переключился на <strong>${subjects[currentSubject]}</strong>. Задавай вопросы!`);
             });
         });
@@ -212,10 +205,7 @@
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message bot';
-            messageDiv.innerHTML = `
-                <div class="avatar">🎓</div>
-                <div class="message-content">${text.replace(/\n/g, '<br>')}</div>
-            `;
+            messageDiv.innerHTML = `<div class="avatar">🎓</div><div class="message-content">${text.replace(/\n/g, '<br>')}</div>`;
             messagesDiv.appendChild(messageDiv);
             scrollToBottom();
         }
@@ -224,81 +214,51 @@
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message user';
-            messageDiv.innerHTML = `
-                <div class="avatar">👤</div>
-                <div class="message-content">${text}</div>
-            `;
+            messageDiv.innerHTML = `<div class="avatar">👤</div><div class="message-content">${text}</div>`;
             messagesDiv.appendChild(messageDiv);
             scrollToBottom();
         }
 
-        function scrollToBottom() {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function showTyping(show) {
-            document.getElementById('typingIndicator').style.display = show ? 'block' : 'none';
-            scrollToBottom();
-        }
+        function scrollToBottom() { const messagesDiv = document.getElementById('messages'); messagesDiv.scrollTop = messagesDiv.scrollHeight; }
+        function showTyping(show) { document.getElementById('typingIndicator').style.display = show ? 'block' : 'none'; scrollToBottom(); }
 
         async function getAccessToken() {
             if (accessToken) return accessToken;
-
-            if (AUTH_HEADER === 'ЗАМЕНИ_НА_СТРОКУ_ИЗ_КАБИНЕТА') {
-                throw new Error('❌ Не указан AUTH_HEADER. Вставь строку из кабинета GigaChat.');
-            }
+            if (AUTH_HEADER.includes('ТВОЯ_СТРОКА')) throw new Error('❌ Вставь свою строку авторизации в AUTH_HEADER!');
             
-            try {
-                const response = await fetch(AUTH_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Accept': 'application/json',
-                        'RqUID': crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-                        'Authorization': AUTH_HEADER   // <-- Вот здесь используется готовая строка!
-                    },
-                    body: `scope=${SCOPE}`
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Ошибка авторизации: ${response.status}`);
-                }
-
-                const data = await response.json();
-                accessToken = data.access_token;
-                return accessToken;
-            } catch (error) {
-                console.error('Ошибка получения токена:', error);
-                throw error;
-            }
+            const response = await fetch(AUTH_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json',
+                    'RqUID': crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+                    'Authorization': AUTH_HEADER
+                },
+                body: `scope=${SCOPE}`
+            });
+            if (!response.ok) throw new Error(`Ошибка авторизации: ${response.status}`);
+            const data = await response.json();
+            accessToken = data.access_token;
+            return accessToken;
         }
 
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const question = input.value.trim();
-            
             if (!question || isProcessing) return;
             
             input.value = '';
             addUserMessage(question);
-            
             isProcessing = true;
             showTyping(true);
-            
             const sendButton = document.querySelector('.input-area button');
             sendButton.disabled = true;
-            
+
             try {
                 const token = await getAccessToken();
-                
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({
                         model: 'GigaChat',
                         messages: [
@@ -309,50 +269,14 @@
                         max_tokens: 2000
                     })
                 });
-                
                 if (!response.ok) {
-                    // Если токен протух, сбрасываем и пробуем ещё раз
-                    if (response.status === 401) {
-                        accessToken = null;
-                        const newToken = await getAccessToken();
-                        // Повторяем запрос с новым токеном
-                        const retryResponse = await fetch(API_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'Authorization': `Bearer ${newToken}`
-                            },
-                            body: JSON.stringify({
-                                model: 'GigaChat',
-                                messages: [
-                                    { role: 'system', content: subjectPrompts[currentSubject] },
-                                    { role: 'user', content: question }
-                                ],
-                                temperature: 0.7,
-                                max_tokens: 2000
-                            })
-                        });
-                        if (!retryResponse.ok) throw new Error(`Ошибка API: ${retryResponse.status}`);
-                        const retryData = await retryResponse.json();
-                        addBotMessage(retryData.choices[0].message.content);
-                        return;
-                    }
+                    if (response.status === 401) { accessToken = null; return sendMessage(); }
                     throw new Error(`Ошибка API: ${response.status}`);
                 }
-                
                 const data = await response.json();
-                
-                if (data.choices && data.choices[0]) {
-                    const answer = data.choices[0].message.content;
-                    addBotMessage(answer);
-                } else {
-                    throw new Error('Нет ответа от API');
-                }
-                
+                addBotMessage(data.choices[0].message.content);
             } catch (error) {
-                console.error('Ошибка:', error);
-                addBotMessage(`❌ <strong>Ошибка соединения.</strong><br><br>${error.message}<br><br>Проверьте подключение к интернету.`);
+                addBotMessage(`❌ Ошибка: ${error.message}`);
             } finally {
                 isProcessing = false;
                 showTyping(false);
@@ -362,21 +286,14 @@
         }
 
         function clearChat() {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML = `
+            document.getElementById('messages').innerHTML = `
                 <div class="message bot">
                     <div class="avatar">🎓</div>
-                    <div class="message-content">
-                        <strong>Чат очищен! Я Student AI — нейросеть для учёбы.</strong><br><br>
-                        Задавай вопросы по математике, физике, химии, русскому, истории или английскому языку!
-                    </div>
-                </div>
-            `;
+                    <div class="message-content"><strong>Чат очищен! Я Student AI — нейросеть для учёбы.</strong><br><br>Задавай вопросы!</div>
+                </div>`;
         }
 
-        window.onload = () => {
-            document.getElementById('userInput').focus();
-        };
+        window.onload = () => document.getElementById('userInput').focus();
     </script>
 </body>
 </html>
