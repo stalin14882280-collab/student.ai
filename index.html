@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student AI — Нейросеть для учёбы</title>
+    <title>🎓 Student AI — Твой помощник (OpenRouter)</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -74,7 +74,7 @@
 
         .subject-btn.active {
             background: white;
-            color: #667eea;
+            color: #1e3c72;
             border-color: white;
         }
 
@@ -86,7 +86,7 @@
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             padding: 20px;
             text-align: center;
@@ -140,7 +140,7 @@
         }
 
         .message.bot .avatar {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
         }
 
@@ -158,7 +158,7 @@
         }
 
         .message.user .message-content {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
         }
 
@@ -185,6 +185,7 @@
             background: white;
             border-radius: 18px;
             width: fit-content;
+            margin-bottom: 20px;
         }
 
         .typing-indicator span {
@@ -192,7 +193,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #667eea;
+            background: #1e3c72;
             margin: 0 3px;
             animation: typing 1.4s infinite;
         }
@@ -224,11 +225,11 @@
         }
 
         .input-area input:focus {
-            border-color: #667eea;
+            border-color: #1e3c72;
         }
 
         .input-area button {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -241,7 +242,7 @@
 
         .input-area button:hover {
             transform: scale(1.02);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px rgba(30, 60, 114, 0.4);
         }
 
         .input-area button:disabled {
@@ -265,7 +266,7 @@
         }
 
         .example-bar a {
-            color: #667eea;
+            color: #1e3c72;
             text-decoration: none;
             margin: 0 10px;
             cursor: pointer;
@@ -298,7 +299,7 @@
         <div class="chat-container">
             <div class="chat-header">
                 <h2>🤖 Student AI Assistant</h2>
-                <span class="badge">DeepSeek-Powered Neural Network</span>
+                <span class="badge">OpenRouter-Powered Neural Network</span>
             </div>
 
             <div class="example-bar">
@@ -309,7 +310,6 @@
             </div>
 
             <div class="messages" id="messages">
-                <!-- Приветственное сообщение -->
                 <div class="message bot">
                     <div class="avatar">🎓</div>
                     <div class="message-content">
@@ -339,59 +339,48 @@
     </div>
 
     <script>
-        // Конфигурация API DeepSeek
-        const API_KEY = "sk-9b2bc703aece420aad3500e63b65017d";  // Получить на platform.deepseek.com/api_keys
-        const API_URL = "https://api.deepseek.com/chat/completions";
+        const OPENROUTER_API_KEY = 'ВАШ_API_КЛЮЧ_OPENROUTER'; // 🔑 ВСТАВЬ СВОЙ КЛЮЧ СЮДА
+        const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+        const SITE_URL = 'https://ваш-сайт.com'; // Укажи URL своего сайта, если есть, или оставь как есть
+        const SITE_NAME = 'Student AI';
 
-        let currentSubject = "all";
+        let currentSubject = 'all';
         let isProcessing = false;
 
-        // Предметные инструкции для модели
         const subjectPrompts = {
-            all: "Ты — Student AI, нейросеть-помощник для учеников. Твоя задача — решать примеры и задачи по любым школьным предметам, объяснять материал понятным языком. Всегда давай подробные пошаговые решения.",
-            math: "Ты — эксперт по математике. Решай уравнения, задачи, объясняй формулы. Всегда показывай пошаговое решение. Используй математическую нотацию.",
-            physics: "Ты — эксперт по физике. Решай задачи, объясняй физические законы и явления. Приводи формулы и расчёты. Объясняй физический смысл.",
-            chemistry: "Ты — эксперт по химии. Помогай с химическими уравнениями, расчётами, объясняй реакции и свойства веществ.",
-            russian: "Ты — эксперт по русскому языку. Проверяй грамматику, пунктуацию, объясняй правила, делай разборы слов и предложений.",
-            history: "Ты — эксперт по истории. Рассказывай о событиях, датах, исторических личностях. Анализируй причины и следствия.",
-            english: "Ты — эксперт по английскому языку. Помогай с переводом, грамматикой, объясняй правила и употребление слов."
+            all: 'Ты — Student AI, нейросеть-помощник для учеников. Твоя задача — решать примеры и задачи по любым школьным предметам, объяснять материал понятным языком. Всегда давай подробные пошаговые решения.',
+            math: 'Ты — эксперт по математике. Решай уравнения, задачи, объясняй формулы. Всегда показывай пошаговое решение. Используй математическую нотацию.',
+            physics: 'Ты — эксперт по физике. Решай задачи, объясняй физические законы и явления. Приводи формулы и расчёты. Объясняй физический смысл.',
+            chemistry: 'Ты — эксперт по химии. Помогай с химическими уравнениями, расчётами, объясняй реакции и свойства веществ.',
+            russian: 'Ты — эксперт по русскому языку. Проверяй грамматику, пунктуацию, объясняй правила, делай разборы слов и предложений.',
+            history: 'Ты — эксперт по истории. Рассказывай о событиях, датах, исторических личностях. Анализируй причины и следствия.',
+            english: 'Ты — эксперт по английскому языку. Помогай с переводом, грамматикой, объясняй правила и употребление слов.'
         };
 
-        // Установка примера в поле ввода
         function setExample(text) {
             document.getElementById('userInput').value = text;
         }
 
-        // Обработка нажатия Enter
         function handleKeyPress(event) {
             if (event.key === 'Enter' && !isProcessing) {
                 sendMessage();
             }
         }
 
-        // Выбор предмета
         document.querySelectorAll('.subject-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 currentSubject = this.dataset.subject;
-                
-                // Добавляем сообщение о смене режима
                 const subjects = {
-                    all: 'все предметы',
-                    math: 'математику',
-                    physics: 'физику',
-                    chemistry: 'химию',
-                    russian: 'русский язык',
-                    history: 'историю',
+                    all: 'все предметы', math: 'математику', physics: 'физику',
+                    chemistry: 'химию', russian: 'русский язык', history: 'историю',
                     english: 'английский язык'
                 };
-                
                 addBotMessage(`🔄 Переключился на <strong>${subjects[currentSubject]}</strong>. Задавай вопросы!`);
             });
         });
 
-        // Добавление сообщения от бота
         function addBotMessage(text) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
@@ -404,7 +393,6 @@
             scrollToBottom();
         }
 
-        // Добавление сообщения пользователя
         function addUserMessage(text) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
@@ -417,32 +405,27 @@
             scrollToBottom();
         }
 
-        // Прокрутка вниз
         function scrollToBottom() {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
-        // Показать/скрыть индикатор печати
         function showTyping(show) {
             document.getElementById('typingIndicator').style.display = show ? 'block' : 'none';
             scrollToBottom();
         }
 
-        // Отправка сообщения
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const question = input.value.trim();
             
             if (!question || isProcessing) return;
             
-            // Проверка API ключа
-            if (API_KEY === "ВАШ_API_КЛЮЧ") {
-                addBotMessage("⚠️ <strong>Внимание!</strong> Нужно указать API ключ DeepSeek.<br><br>Замените <code>ВАШ_API_КЛЮЧ</code> в коде на реальный ключ с <a href='https://platform.deepseek.com/api_keys' target='_blank'>platform.deepseek.com</a>");
+            if (OPENROUTER_API_KEY === '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') {
+                addBotMessage("⚠️ <strong>Внимание!</strong> Нужно указать API ключ OpenRouter.<br><br>Замените <code>ВАШ_API_КЛЮЧ_OPENROUTER</code> в коде на реальный ключ с <a href='https://openrouter.ai/' target='_blank'>openrouter.ai</a>");
                 return;
             }
             
-            // Очистка поля и добавление сообщения
             input.value = '';
             addUserMessage(question);
             
@@ -457,17 +440,19 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
+                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                        'HTTP-Referer': SITE_URL,
+                        'X-Title': SITE_NAME,
                     },
                     body: JSON.stringify({
-                        model: "deepseek-chat",
+                        model: 'deepseek/deepseek-chat-v3-0324:free', // Бесплатная модель DeepSeek
                         messages: [
                             {
-                                role: "system",
+                                role: 'system',
                                 content: subjectPrompts[currentSubject]
                             },
                             {
-                                role: "user",
+                                role: 'user',
                                 content: question
                             }
                         ],
@@ -482,12 +467,12 @@
                     const answer = data.choices[0].message.content;
                     addBotMessage(answer);
                 } else {
-                    throw new Error('Нет ответа от API');
+                    throw new Error(data.error?.message || 'Нет ответа от API');
                 }
                 
             } catch (error) {
                 console.error('Ошибка:', error);
-                addBotMessage("❌ <strong>Ошибка соединения.</strong><br><br>Проверьте:<br>• Правильность API ключа<br>• Подключение к интернету<br>• Лимиты на использование API");
+                addBotMessage(`❌ <strong>Ошибка соединения.</strong><br><br>${error.message}<br><br>Проверьте правильность API ключа и подключение к интернету.`);
             } finally {
                 isProcessing = false;
                 showTyping(false);
@@ -496,7 +481,6 @@
             }
         }
 
-        // Очистка чата
         function clearChat() {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = `
@@ -510,7 +494,6 @@
             `;
         }
 
-        // Фокус на поле ввода при загрузке
         window.onload = () => {
             document.getElementById('userInput').focus();
         };
